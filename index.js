@@ -7,11 +7,19 @@ const topicRouter = require('./routes/Topics/topics');
 const userRouter = require('./routes/LoginAndRegistor/user')
 const bodyParser = require("body-parser");
 const dotenv = require('dotenv') ;
+const cookieParser = require("cookie-parser");
 dotenv.config() ;
 
 app.use(express.json());
 app.use(bodyParser.json()) ;
 app.use(cors()) ;
+app.use(cookieParser())
+app.use(function(req, res, next) {  
+  res.header("Access-Control-Allow-Headers","*");
+res.header('Access-Control-Allow-Credentials', true);
+res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  next();
+});
 // create mongodb connection 
 
 async function mongodb() {
