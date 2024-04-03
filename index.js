@@ -11,9 +11,11 @@ const cookieParser = require("cookie-parser");
 dotenv.config() ;
 
 app.use(express.json());
-app.use(bodyParser.json()) ;
+
+app.use(bodyParser.json({ limit: '1gb' }));
 app.use(cors()) ;
 app.use(cookieParser())
+
 app.use(function(req, res, next) {  
   res.header("Access-Control-Allow-Headers","*");
 res.header('Access-Control-Allow-Credentials', true);

@@ -1,4 +1,4 @@
-const { user, userView, admin, adminView } = require("../../model/User/user");
+const { user } = require("../../model/User/user");
 const bcrypt = require('bcrypt')
 const { generateToken, verifyToken } = require("../../Services/auth")
 // < ------ POST REQUESTS ----------- >
@@ -16,8 +16,9 @@ const postUserRegistration = async (req, res) => {
     let Password = req.body.password;
     let Re_password = req.body.re_password;
     let ImageUrl = req.body.profile;
+    let Token = "" ;
     const existUser = await user.findOne({ "Email": Email });
-    console.log(existUser)
+    
     if (existUser) {
         res.send("user already exist ")
     } else {
@@ -26,8 +27,14 @@ const postUserRegistration = async (req, res) => {
             const hash = bcrypt.hashSync(Password, salt);
 
 
-            const newUser = new user({ Username, Email, Password, ImageUrl });
+            const newUser = new user({ Username, Email, Password, ImageUrl , Token });
             newUser.Password = hash;
+           const tokenCredential = {
+                id : newUser._id ,
+                email : newUser.Email 
+                
+            }
+            newUser.Token = generateToken(tokenCredential) ;
             const result = await newUser.save();
             if (result) {
                 res.status(200).send("User saved !")
@@ -79,26 +86,19 @@ const postUserLogin = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-
-        const userPayload = {
-            id: existUser._id,
-            email: existUser.Email
-        };
-
-        const token = generateToken(userPayload);
+        const getToken = existUser.Token ;
+        const token = generateToken(getToken);
 
         if (token) {
-           
-            console.log('Request successful. Token:', token);
+            
             res.cookie('jwt' , token ,{httpOnly: true, secure:false}) ;
-            return res.status(200).json({ message: 'Success' , Token: token });
+             res.status(200).json({ message: 'Successfully logged in !' , Token:token });
             
         } else {
-            return res.status(500).json({ message: 'Token generation error' });
+             res.status(500).json({ message: 'Token fault !' });
         }
     } catch (error) {
-        console.error('Error:', error.message);
-        window.alert(error.message)
+        
         return res.status(500).json({ message: 'Server error' });
     }
 };
