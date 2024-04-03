@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 
+
 function generateToken(user){
     const token  =  jwt.sign(
         {
