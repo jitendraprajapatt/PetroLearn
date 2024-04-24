@@ -74,6 +74,11 @@ const postUserLogin = async (req, res) => {
    
     const email = req.body.email;
     const password = req.body.password;
+    if(req.body === null){
+        
+       res.json({ message: 'data not get' });
+    }
+    
     try {
         const existUser = await user.findOne({ "Email": email });
 
